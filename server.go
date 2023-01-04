@@ -1,11 +1,19 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
+
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func main() {
-	fmt.Println("Please use server.go for main file")
-	fmt.Println("start at port:", os.Getenv("PORT"))
+	port := os.Getenv("Port")
+	addr := ":" + port
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	log.Println("Server started at:", port)
+	log.Fatal(e.Start(addr))
 }
