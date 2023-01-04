@@ -14,14 +14,32 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
+func AuthMiddleware(key string, c echo.Context) (bool, error) {
+	log.Println("[", key, "]")
+	if key == "10, 2009" {
+		return true, nil
+	}
+	return false, nil
+}
+
+func gethealthHandler(c echo.Context) error {
+	return c.JSON(http.StatusOK, "OK")
+}
+
 func main() {
 	port := os.Getenv("Port")
 	addr := ":" + port
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	log.Println("Server started at:", port)
+	//set auth
+	e.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+		AuthScheme: "November",
+		Validator:  AuthMiddleware,
+	}))
+	e.GET("/healths", gethealthHandler)
 
+	log.Println("Server started at:", port)
 	go func() {
 		if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting down the server")
