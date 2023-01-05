@@ -6,10 +6,10 @@ import (
 	"github.com/labstack/echo"
 )
 
-func gethealthHandler(c echo.Context) error {
+func (h *Handler) gethealthHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, "OK")
 }
 
-func SetupRoute(e *echo.Echo) {
-	e.GET("/healths", gethealthHandler)
+func (h *Handler) SetupRoute(e *echo.Echo) {
+	e.GET("/healths", h.gethealthHandler)
 }
