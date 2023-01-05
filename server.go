@@ -1,11 +1,26 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 	"os"
+
+	"github.com/propolizboy/assessment/db"
+	"github.com/propolizboy/assessment/handler"
+	"github.com/propolizboy/assessment/router"
 )
 
 func main() {
-	fmt.Println("Please use server.go for main file")
-	fmt.Println("start at port:", os.Getenv("PORT"))
+	e := router.Setup()
+	d := db.NewDB()
+	h := handler.NewHandler(d)
+	h.SetupRoute(e)
+
+	addr := ":" + os.Getenv("Port")
+	go func() {
+		if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	router.SetupGracefulShutdown(e)
 }
