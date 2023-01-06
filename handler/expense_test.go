@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -36,15 +35,15 @@ func TestCreateExpense(t *testing.T) {
 	assert.Equal(t, []string{"food", "beverage"}, e.Tags)
 }
 
-func TestGetEnpense(t *testing.T) {
+func TestGetByIDEnpense(t *testing.T) {
 	e := seedExpense(t)
 	var latest expense.Expenses
-	res := request(http.MethodGet, uri("expense", strconv.Itoa(e.ID)), nil)
+	res := request(http.MethodGet, uri("expenses", strconv.Itoa(e.ID)), nil)
 	err := res.Decode(&latest)
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.NotEqual(t, e.ID, latest.ID)
+	assert.Equal(t, e.ID, latest.ID)
 	assert.Equal(t, "strawberry smoothie", latest.Title)
 	assert.Equal(t, float64(79), latest.Amount)
 	assert.Equal(t, "night market promotion discount 10 bath", latest.Note)
@@ -59,12 +58,11 @@ func seedExpense(t *testing.T) expense.Expenses {
 		"note": "night market promotion discount 10 bath", 
 		"tags": ["food", "beverage"]
 	}`)
-	url := uri("users")
+	url := uri("expenses")
 	err := request(http.MethodPost, url, body).Decode(&c)
 	if err != nil {
 		t.Fatal("can't create uomer:", err)
 	}
-	fmt.Println(c)
 	return c
 }
 
