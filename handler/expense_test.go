@@ -35,7 +35,7 @@ func TestCreateExpense(t *testing.T) {
 	assert.Equal(t, []string{"food", "beverage"}, e.Tags)
 }
 
-func TestGetByIDEnpense(t *testing.T) {
+func TestGetEnpenseByID(t *testing.T) {
 	e := seedExpense(t)
 	var latest expense.Expenses
 	res := request(http.MethodGet, uri("expenses", strconv.Itoa(e.ID)), nil)
@@ -44,10 +44,10 @@ func TestGetByIDEnpense(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, e.ID, latest.ID)
-	assert.Equal(t, "strawberry smoothie", latest.Title)
-	assert.Equal(t, float64(79), latest.Amount)
-	assert.Equal(t, "night market promotion discount 10 bath", latest.Note)
-	assert.Equal(t, []string{"food", "beverage"}, latest.Tags)
+	assert.Equal(t, e.Title, latest.Title)
+	assert.Equal(t, e.Amount, latest.Amount)
+	assert.Equal(t, e.Note, latest.Note)
+	assert.Equal(t, e.Tags, latest.Tags)
 }
 
 func seedExpense(t *testing.T) expense.Expenses {
