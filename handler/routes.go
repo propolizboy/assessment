@@ -15,4 +15,5 @@ func (h *Handler) SetupRoute(e *echo.Echo) {
 	e.POST("/expenses", h.CreateExpenseHandler)
 	e.GET("/expenses/:id", h.GetExpenseByIDHandler)
 	e.PUT("/expenses/:id", h.UpdateExpenseByIDHandler)
+	e.GET("/expenses", h.GETAllExpenseHandler)
 }

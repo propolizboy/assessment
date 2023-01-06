@@ -16,3 +16,7 @@ func (h *Handler) GetExpenseByIDHandler(c echo.Context) error {
 func (h *Handler) UpdateExpenseByIDHandler(c echo.Context) error {
 	return expense.UpdateByID(c, h.DB)
 }
+
+func (h *Handler) GETAllExpenseHandler(c echo.Context) error {
+	return expense.GetAll(c, h.DB)
+}

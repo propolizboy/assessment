@@ -48,7 +48,7 @@ func GetById(c echo.Context, db *sql.DB) error {
 	id := c.Param("id")
 	stmt, err := db.Prepare("SELECT id,title ,amount ,note ,tags FROM expenses where id=$1")
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Err{Message: "can't prepare query users statment:" + err.Error()})
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't prepare query expenses statment:" + err.Error()})
 	}
 	row := stmt.QueryRow(id)
 	var e Expenses
@@ -61,7 +61,6 @@ func GetById(c echo.Context, db *sql.DB) error {
 	default:
 		return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan expense:" + err.Error()})
 	}
-
 }
 
 func UpdateByID(c echo.Context, db *sql.DB) error {
@@ -71,7 +70,7 @@ func UpdateByID(c echo.Context, db *sql.DB) error {
 	stmt, err := db.Prepare("Update expenses set title=$2 ,amount=$3 ,note=$4 ,tags=$5 where id=$1 RETURNING id,title ,amount ,note ,tags ")
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Err{Message: "can't prepare query users statment:" + err.Error()})
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't prepare query expenses statment:" + err.Error()})
 	}
 	row := stmt.QueryRow(id, e.Title, e.Amount, e.Note, pq.Array(e.Tags))
 	err = row.Scan(&e.ID, &e.Title, &e.Amount, &e.Note, pq.Array(&e.Tags))
@@ -81,7 +80,32 @@ func UpdateByID(c echo.Context, db *sql.DB) error {
 	case nil:
 		return c.JSON(http.StatusOK, e)
 	default:
-		return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan user:" + err.Error()})
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan expenses:" + err.Error()})
 	}
+}
+
+func GetAll(c echo.Context, db *sql.DB) error {
+	stmt, err := db.Prepare("SELECT id,title ,amount ,note ,tags FROM expenses")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't prepare query expenses statment:" + err.Error()})
+	}
+
+	rows, err := stmt.Query()
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't query all expenses" + err.Error()})
+	}
+
+	expenses := []Expenses{}
+	for rows.Next() {
+		var e Expenses
+		err = rows.Scan(&e.ID, &e.Title, &e.Amount, &e.Note, pq.Array(&e.Tags))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan user:" + err.Error()})
+		}
+		expenses = append(expenses, e)
+	}
+
+	return c.JSON(http.StatusOK, expenses)
 
 }
