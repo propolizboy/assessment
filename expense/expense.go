@@ -55,7 +55,29 @@ func GetById(c echo.Context, db *sql.DB) error {
 	err = row.Scan(&e.ID, &e.Title, &e.Amount, &e.Note, pq.Array(&e.Tags))
 	switch err {
 	case sql.ErrNoRows:
-		return c.JSON(http.StatusNotFound, Err{Message: "user not found"})
+		return c.JSON(http.StatusNotFound, Err{Message: "expense not found"})
+	case nil:
+		return c.JSON(http.StatusOK, e)
+	default:
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan expense:" + err.Error()})
+	}
+
+}
+
+func UpdateByID(c echo.Context, db *sql.DB) error {
+	id := c.Param("id")
+	var e Expenses
+	err := c.Bind(&e)
+	stmt, err := db.Prepare("Update expenses set title=$2 ,amount=$3 ,note=$4 ,tags=$5 where id=$1 RETURNING id,title ,amount ,note ,tags ")
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't prepare query users statment:" + err.Error()})
+	}
+	row := stmt.QueryRow(id, e.Title, e.Amount, e.Note, pq.Array(e.Tags))
+	err = row.Scan(&e.ID, &e.Title, &e.Amount, &e.Note, pq.Array(&e.Tags))
+	switch err {
+	case sql.ErrNoRows:
+		return c.JSON(http.StatusNotFound, Err{Message: "expense not found"})
 	case nil:
 		return c.JSON(http.StatusOK, e)
 	default:
