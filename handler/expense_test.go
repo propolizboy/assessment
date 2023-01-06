@@ -65,10 +65,10 @@ func TestUpdateEnpenseByID(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, e.ID, latest.ID)
-	assert.Equal(t, e.Title, latest.Title)
-	assert.Equal(t, e.Amount, latest.Amount)
-	assert.Equal(t, e.Note, latest.Note)
-	assert.Equal(t, e.Tags, latest.Tags)
+	assert.Equal(t, "apple smoothie", latest.Title)
+	assert.Equal(t, float64(89), latest.Amount)
+	assert.Equal(t, "no discount", latest.Note)
+	assert.Equal(t, []string{"beverage"}, latest.Tags)
 }
 
 func seedExpense(t *testing.T) expense.Expenses {
