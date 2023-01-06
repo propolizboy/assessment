@@ -13,6 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type Response struct {
+	*http.Response
+	err error
+}
+
 func TestCreateExpense(t *testing.T) {
 	body := bytes.NewBufferString(`{
 		"title": "strawberry smoothie",
@@ -71,6 +76,16 @@ func TestUpdateEnpenseByID(t *testing.T) {
 	assert.Equal(t, []string{"beverage"}, latest.Tags)
 }
 
+func TestGetAllUser(t *testing.T) {
+	seedExpense(t)
+	var es []expense.Expenses
+	res := request(http.MethodGet, uri("expenses"), nil)
+	err := res.Decode(&es)
+	assert.Nil(t, err)
+	assert.EqualValues(t, http.StatusOK, res.StatusCode)
+	assert.Greater(t, len(es), 0)
+}
+
 func seedExpense(t *testing.T) expense.Expenses {
 	var c expense.Expenses
 	body := bytes.NewBufferString(`{
@@ -104,11 +119,6 @@ func request(method, url string, body io.Reader) *Response {
 	client := http.Client{}
 	res, err := client.Do(req)
 	return &Response{res, err}
-}
-
-type Response struct {
-	*http.Response
-	err error
 }
 
 func (r *Response) Decode(v interface{}) error {
