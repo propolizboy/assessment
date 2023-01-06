@@ -21,6 +21,10 @@ type Expenses struct {
 	Tags   []string `json:"tags"`
 }
 
+type Err struct {
+	Message string `json:"message"`
+}
+
 func Create(c echo.Context, db *sql.DB) error {
 	var e Expenses
 	err := c.Bind(&e)
@@ -38,4 +42,24 @@ func Create(c echo.Context, db *sql.DB) error {
 	}
 
 	return c.JSON(http.StatusCreated, e)
+}
+
+func GetById(c echo.Context, db *sql.DB) error {
+	id := c.Param("id")
+	stmt, err := db.Prepare("SELECT id,title ,amount ,note ,tags FROM expenses where id=$1")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't prepare query users statment:" + err.Error()})
+	}
+	row := stmt.QueryRow(id)
+	var e Expenses
+	err = row.Scan(&e.ID, &e.Title, &e.Amount, &e.Note, pq.Array(&e.Tags))
+	switch err {
+	case sql.ErrNoRows:
+		return c.JSON(http.StatusNotFound, Err{Message: "user not found"})
+	case nil:
+		return c.JSON(http.StatusOK, e)
+	default:
+		return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan user:" + err.Error()})
+	}
+
 }
