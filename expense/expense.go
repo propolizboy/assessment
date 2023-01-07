@@ -2,7 +2,6 @@ package expense
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -37,7 +36,6 @@ func Create(c echo.Context, db *sql.DB) error {
 
 	err = row.Scan(&e.ID)
 	if err != nil {
-		log.Panic(errMsgInsertFailed, err)
 		return c.JSON(http.StatusBadRequest, errMsgInsertFailed)
 	}
 
