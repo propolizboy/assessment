@@ -101,7 +101,7 @@ func GetAll(c echo.Context, db *sql.DB) error {
 		var e Expenses
 		err = rows.Scan(&e.ID, &e.Title, &e.Amount, &e.Note, pq.Array(&e.Tags))
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan user:" + err.Error()})
+			return c.JSON(http.StatusInternalServerError, Err{Message: "can't scan expenses:" + err.Error()})
 		}
 		expenses = append(expenses, e)
 	}
